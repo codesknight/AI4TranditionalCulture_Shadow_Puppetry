@@ -10,6 +10,7 @@
   background: var(--paper);
   font-synthesis: none;
 }
+
 * {
   box-sizing: border-box;
 }
@@ -759,5 +760,496 @@ footer {
   }
   * {
     transition: none !important;
+  }
+}
+
+/* Playground extension: scene tools and game feedback. */
+[hidden] {
+  display: none !important;
+}
+.game-hud {
+  display: flex;
+  align-items: center;
+  gap: 38px;
+  padding: 18px 24px;
+  margin-bottom: 14px;
+  background: #e9e1d1;
+  border: 1px solid #d1c5b0;
+}
+.mode-switch {
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+}
+.mode-tab {
+  border: 0;
+  background: transparent;
+  padding: 13px 19px;
+  color: #7a6d5a;
+  font-size: 12px;
+  border-radius: 4px;
+}
+.mode-tab.active {
+  background: #302b23;
+  color: #f9e5bb;
+  box-shadow: 0 3px 10px #30201322;
+}
+#challenge {
+  background: #277466;
+  color: #f1f5da;
+}
+#challenge:hover {
+  background: #1a5d52;
+}
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 65px;
+}
+.hud-stat > span {
+  font-size: 9px;
+  color: #8a7d68;
+  letter-spacing: 1px;
+}
+.hud-stat strong {
+  font:
+    23px Georgia,
+    serif;
+  color: #54432e;
+  font-variant-numeric: tabular-nums;
+}
+.best-stat strong {
+  color: #a37839;
+}
+.studio {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+.mission {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  min-height: 112px;
+  padding: 18px 28px;
+  background: #32332b;
+  color: #f3e3c5;
+  border-bottom: 1px solid #64573e;
+}
+.mission > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.mission #mission-tag {
+  display: block;
+  color: #8ac3ad;
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-bottom: 7px;
+}
+.mission strong {
+  display: block;
+  font:
+    19px/1.5 'SimSun',
+    serif;
+  letter-spacing: 1px;
+}
+.mission p {
+  font-size: 10px;
+  color: #bdb19b;
+  line-height: 1.8;
+  margin: 6px 0 0;
+}
+.match-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 67px;
+  height: 67px;
+  border: 1px solid #75b5a66b;
+  border-radius: 50%;
+  background: #75b5a610;
+}
+.match-ring strong {
+  font:
+    19px Georgia,
+    serif;
+  color: #9dd4bf;
+}
+.match-ring span {
+  font-size: 8px;
+  color: #9ab8a9;
+  margin-top: 5px;
+  letter-spacing: 1px;
+}
+.hold-track {
+  height: 3px;
+  background: #192c2855;
+  margin-top: 9px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+#hold-progress {
+  height: 100%;
+  width: 0;
+  background: #72cfb1;
+  transition: width 0.06s linear;
+}
+.stage {
+  background: radial-gradient(
+    ellipse at var(--light-x, 18%) var(--light-y, 18%),
+    var(--lamp-hot, #fff1c9) 0,
+    var(--screen-mid, #f1d9a5) 56%,
+    var(--screen-edge, #cfad77) 100%
+  );
+}
+.stage[data-material='paper'] {
+  --screen-mid: #eee9dc;
+  --screen-edge: #d5cdbc;
+}
+.stage[data-material='night'] {
+  --screen-mid: #90aca4;
+  --screen-edge: #496574;
+}
+.stage[data-light='moon'] {
+  --lamp-hot: #e5f9f6;
+}
+.stage[data-light='rose'] {
+  --lamp-hot: #f8c6bc;
+}
+.stage[data-game='won'] {
+  box-shadow: inset 0 0 55px #d8a04a77;
+}
+.target-ghost {
+  opacity: 0.26;
+}
+.target-ghost path,
+.target-ghost circle {
+  fill: #32b798 !important;
+  stroke: #08795f !important;
+}
+.target-ghost .joint {
+  fill: #d2ffdd !important;
+}
+.object-drag {
+  cursor: grab;
+  touch-action: none;
+}
+.object-drag:active {
+  cursor: grabbing;
+}
+.object-label {
+  font:
+    11px 'Microsoft YaHei',
+    sans-serif;
+  fill: #725b37;
+  letter-spacing: 1px;
+}
+.lamp-aura {
+  fill: #f9d677;
+  opacity: 0.19;
+  stroke: #b18e4e;
+  stroke-dasharray: 3 5;
+}
+.light-source:hover .lamp-aura {
+  opacity: 0.5;
+}
+.light-source[data-color='moon'] .lamp-aura {
+  fill: #b9f0ef;
+}
+.light-source[data-color='rose'] .lamp-aura {
+  fill: #f3a5aa;
+}
+.rod-handle.selected .grip {
+  stroke: #267565;
+  stroke-width: 3px;
+  fill: #e6f0d6;
+}
+.touch-controls {
+  display: flex;
+  padding: 0 24px 20px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.touch-controls button {
+  border: 1px solid #685b49;
+  border-radius: 4px;
+  background: #393229;
+  color: #e8d5b0;
+  padding: 10px 13px;
+  font-size: 16px;
+}
+.touch-controls button span {
+  font-size: 10px;
+  margin-left: 5px;
+}
+.touch-controls button:hover {
+  background: #61503a;
+}
+.touch-controls .restore-scene {
+  margin-left: auto;
+  color: #a79a86;
+}
+.object-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 20px 0 12px;
+}
+.object-tabs button {
+  border: 1px solid #d7cbb5;
+  border-radius: 4px;
+  background: transparent;
+  padding: 10px 0;
+  font-size: 21px;
+  color: #9e825a;
+}
+.object-tabs button span {
+  display: block;
+  font-size: 10px;
+  margin-top: 5px;
+}
+.object-tabs button.active {
+  border-color: #2f7564;
+  background: #e0e9d8;
+  color: #2c6f5e;
+}
+.object-summary {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #4c7666;
+  min-height: 20px;
+  margin-bottom: 15px;
+}
+.object-panel {
+  min-height: 220px;
+}
+.object-panel .adjustments {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.object-panel select {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #d4c5aa;
+  border-radius: 3px;
+  background: #f5efdf;
+  color: #66533e;
+  font:
+    11px 'Microsoft YaHei',
+    sans-serif;
+}
+.tool-tip {
+  font-size: 9px;
+  line-height: 1.9;
+  color: #97856b;
+  margin: 14px 0;
+}
+.rod-picker {
+  display: flex;
+  gap: 5px;
+}
+.rod-picker button {
+  flex: 1;
+  border: 1px solid #d4c5aa;
+  background: transparent;
+  font-size: 10px;
+  padding: 9px 4px;
+  color: #897254;
+}
+.rod-picker button.active {
+  background: #dfebd9;
+  border-color: #487a65;
+  color: #366d58;
+}
+.controls .check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.check-row input {
+  accent-color: #2e7664;
+}
+.action-section {
+  padding-top: 19px;
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.action-section .section-label {
+  margin-bottom: 11px;
+}
+.action-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.action {
+  padding: 9px 7px;
+  border-radius: 3px;
+}
+.action-icon {
+  font-size: 19px;
+  height: 26px;
+}
+.action strong {
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.action small {
+  font-size: 7px;
+}
+.controls {
+  padding: 25px 22px;
+}
+.svg-hint {
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+.spark {
+  transform-box: view-box;
+  transform-origin: 500px 260px;
+  animation: burst 0.9s ease-out both;
+}
+@keyframes burst {
+  from {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+    opacity: 0;
+  }
+}
+@media (max-width: 1050px) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr) 285px;
+  }
+  .game-hud {
+    gap: 20px;
+  }
+  .controls {
+    padding: 22px 18px;
+  }
+  .mode-tab {
+    padding: 12px;
+  }
+  .mission {
+    padding: 16px 20px;
+  }
+  .mission strong {
+    font-size: 17px;
+  }
+  .touch-controls {
+    padding: 0 18px 17px;
+  }
+  .touch-controls button {
+    padding: 9px;
+  }
+  .touch-controls button span {
+    font-size: 9px;
+  }
+  .best-stat {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .studio {
+    grid-template-columns: 1fr;
+  }
+  .game-hud {
+    flex-wrap: wrap;
+    padding: 13px 15px;
+    gap: 13px 22px;
+  }
+  .mode-switch {
+    width: 100%;
+    margin-right: 0;
+  }
+  .mode-tab {
+    flex: 1;
+  }
+  .hud-stat {
+    min-width: 50px;
+  }
+  .hud-stat strong {
+    font-size: 21px;
+  }
+  .best-stat {
+    display: flex;
+    margin-left: auto;
+  }
+  .mission {
+    min-height: 110px;
+    padding: 16px;
+  }
+  .mission strong {
+    font-size: 16px;
+  }
+  .mission p {
+    font-size: 9px;
+  }
+  .match-ring {
+    width: 58px;
+    height: 58px;
+  }
+  .touch-controls {
+    padding: 0 13px 15px;
+    gap: 6px;
+  }
+  .touch-controls button {
+    flex: 1;
+    padding: 10px 3px;
+  }
+  .touch-controls button span {
+    font-size: 9px;
+    margin-left: 1px;
+  }
+  .touch-controls .restore-scene {
+    flex-basis: 100%;
+    padding: 8px;
+  }
+  .object-panel {
+    min-height: 0;
+  }
+  .controls {
+    padding: 24px;
+  }
+  .action {
+    padding: 12px;
+  }
+  .action strong {
+    font-size: 11px;
+  }
+  .action small {
+    font-size: 9px;
+  }
+  .object-tabs button {
+    padding: 12px;
+  }
+  .object-summary {
+    font-size: 11px;
+  }
+  .tool-tip {
+    font-size: 10px;
+  }
+  .action-section {
+    margin-top: 24px;
+  }
+  .svg-hint {
+    font-size: 9px;
+  }
+  .stage-caption {
+    bottom: 9px;
+  }
+  .stage-inscription {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spark {
+    animation: none;
+    opacity: 0;
   }
 }

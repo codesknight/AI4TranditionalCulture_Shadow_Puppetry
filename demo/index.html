@@ -12,8 +12,11 @@
     <link rel="stylesheet" href="style.css" />
     <script src="core/config.js" defer></script>
     <script src="core/actions.js" defer></script>
-    <script src="core/model.js" defer></script>
+    <script src="core/entities.js" defer></script>
     <script src="core/kinematics.js" defer></script>
+    <script src="core/projection.js" defer></script>
+    <script src="core/game.js" defer></script>
+    <script src="core/model.js" defer></script>
     <script src="core/renderer.js" defer></script>
     <script src="controller.js" defer></script>
   </head>
@@ -27,21 +30,54 @@
     <main>
       <section class="intro">
         <div>
-          <p class="eyebrow">一幕，一灯，一双手</p>
-          <h1>让光影，<em>动起来。</em></h1>
+          <p class="eyebrow">SHADOW PLAYGROUND · 光影游乐场</p>
+          <h1>这场戏，<em>由你来玩。</em></h1>
           <p class="lead">
-            走到幕后来，牵动手中的签杆。<br
-              class="mobile-break"
-            />一抬手、一转身，故事从你的指尖开始。
+            拖动灯，牵起签，让影子变大、跳起、转身。<br class="mobile-break" />自由造一场戏，或挑战
+            75 秒影子闯关。
           </p>
         </div>
         <div class="intro-note"><span class="mini-line"></span>以手为引<br />以光成戏</div>
+      </section>
+      <section class="game-hud" aria-label="游戏状态">
+        <div class="mode-switch">
+          <button id="sandbox" class="mode-tab active">自由戏台</button
+          ><button id="challenge" class="mode-tab">开始闯关 <span>→</span></button
+          ><button id="pause-game" class="mode-tab" hidden>暂停 Ⅱ</button>
+        </div>
+        <div class="hud-stat"><span>得分</span><strong id="score">0000</strong></div>
+        <div class="hud-stat"><span>关卡</span><strong id="round">— / 5</strong></div>
+        <div class="hud-stat">
+          <span>倒计时</span><strong id="timer">75<span>s</span></strong>
+        </div>
+        <div class="hud-stat best-stat"><span>本机最佳</span><strong id="best">0000</strong></div>
       </section>
       <section class="studio" aria-label="皮影互动戏台">
         <div class="theatre-column">
           <div class="stage-heading">
             <span><i class="live-dot"></i> 光影戏台</span
             ><span id="mode-label" aria-live="polite">自由操偶</span>
+          </div>
+          <div class="mission">
+            <div>
+              <span id="mission-tag">自由探索</span
+              ><strong id="mission-title" aria-live="polite">把幕后变成你的游乐场</strong>
+              <p id="mission-hint">拖动灯和影偶；点选工具箱中的四类对象，发现影子的变化。</p>
+              <div
+                id="hold-track"
+                class="hold-track"
+                role="progressbar"
+                aria-label="保持对齐进度"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+              >
+                <div id="hold-progress"></div>
+              </div>
+            </div>
+            <div class="match-ring">
+              <strong id="match">✦</strong><span id="match-label">PLAY</span>
+            </div>
           </div>
           <div class="stage" id="stage">
             <div class="corner corner-tl"></div>
@@ -105,15 +141,67 @@
                 filter="url(#floor-blur)"
               />
               <path d="M45 515H955" stroke="#9b7645" opacity=".22" />
-              <g id="puppet" filter="url(#puppet-shadow)"></g>
+              <g id="screen-object" class="screen-object">
+                <rect
+                  x="35"
+                  y="38"
+                  width="930"
+                  height="495"
+                  rx="7"
+                  fill="none"
+                  stroke="#a17c45"
+                  stroke-dasharray="5 9"
+                  opacity=".3"
+                />
+                <g
+                  data-object="screen"
+                  class="object-drag"
+                  tabindex="0"
+                  role="button"
+                  aria-label="拖动影幕，方向键微调"
+                >
+                  <rect
+                    x="858"
+                    y="38"
+                    width="98"
+                    height="26"
+                    rx="13"
+                    fill="#efe0bc"
+                    stroke="#b99a6a"
+                  />
+                  <text x="907" y="55" text-anchor="middle" class="object-label">▣ 影幕</text>
+                </g>
+              </g>
+              <g id="target-ghost" class="target-ghost" pointer-events="none"></g>
+              <g
+                id="puppet"
+                data-object="puppet"
+                class="object-drag"
+                filter="url(#puppet-shadow)"
+              ></g>
               <g id="rods"></g>
               <g id="handles"></g>
+              <g
+                id="light-source"
+                data-object="lamp"
+                class="object-drag light-source"
+                tabindex="0"
+                role="button"
+                aria-label="拖动光源，方向键微调"
+              >
+                <circle class="lamp-aura" r="45" />
+                <circle r="23" fill="#f8d67d" stroke="#9d723c" stroke-width="2" />
+                <path d="M-7-5q0-12 8-12q15 4 5 17l-2 6h-9l-2-6Z" fill="#fff8db" stroke="#a27a3d" />
+                <path d="M-5 12H4M-4 16H3" stroke="#996835" stroke-width="3" />
+                <text y="66" text-anchor="middle" class="object-label">☀ 拖动灯光</text>
+              </g>
+              <g id="effects" pointer-events="none"></g>
               <text x="500" y="613" class="svg-hint" text-anchor="middle">
-                拖动三个圆形手柄，试着操纵影人
+                A / D 移动 · W 跳跃 · F 转身 · Q / E 左手 · O / P 右手
               </text>
             </svg>
             <div class="stage-caption">
-              <span>武生 · 示意影人</span><span>SHADOW STUDY — 001</span>
+              <span>武生 · 你的光影分身</span><span>投影倍率 <b id="magnification">1.12×</b></span>
             </div>
           </div>
           <div class="playbar">
@@ -124,41 +212,174 @@
             </div>
             <button id="reset" class="text-button">↺ <span>归位</span></button>
           </div>
+          <div class="touch-controls" role="group" aria-label="影偶快捷操作">
+            <button data-move="-25" aria-label="向左移动">← <span>左移</span></button
+            ><button data-move="25" aria-label="向右移动">→ <span>右移</span></button
+            ><button id="jump">↑ <span>跳起来</span></button
+            ><button id="flip">⇄ <span>转个身</span></button
+            ><button id="reset-scene" class="restore-scene">↺ <span>重置场景</span></button>
+          </div>
         </div>
         <aside class="controls">
           <div class="panel-heading">
-            <span class="eyebrow">THE MOVEMENT</span>
-            <h2>起一段身法</h2>
-            <p>从一个动作，认识皮影的灵巧。</p>
+            <span class="eyebrow">YOUR STAGE, YOUR RULES</span>
+            <h2>幕后工具箱</h2>
+            <p>四个独立对象，搭出自己的光影世界。</p>
           </div>
-          <div class="action-grid" role="group" aria-label="??????"></div>
-          <div class="adjustments">
-            <div class="section-label">签杆微调 <span>手动控制</span></div>
-            <label for="body">身体位置 <output id="body-value">居中</output></label
+          <div class="object-tabs" role="group" aria-label="选择场景对象">
+            <button data-select="lamp">☀<span>光源</span></button
+            ><button data-select="screen">▣<span>影幕</span></button
+            ><button data-select="puppet" class="active">♙<span>影偶</span></button
+            ><button data-select="rod-left">⌁<span>签杆</span></button>
+          </div>
+          <div id="object-summary" class="object-summary">影偶 · 拖动身体，或牵动手签</div>
+          <div id="panel-light" class="object-panel" hidden>
+            <label for="lamp-x">灯光横向 <output id="lamp-x-value"></output></label
             ><input
-              id="body"
+              id="lamp-x"
               type="range"
-              min="-180"
-              max="180"
-              value="0"
-              aria-label="身体水平位置"
-            /><label for="left">左侧手臂 <output id="left-value">自然</output></label
-            ><input
-              id="left"
-              type="range"
-              min="-90"
-              max="90"
-              value="0"
-              aria-label="画面左侧手臂抬起角度"
-            /><label for="right">右侧手臂 <output id="right-value">自然</output></label
-            ><input
-              id="right"
-              type="range"
-              min="-90"
-              max="90"
-              value="0"
-              aria-label="画面右侧手臂抬起角度"
+              min="80"
+              max="920"
+              value="180"
+              data-entity="lamp"
+              data-field="x"
             />
+            <label for="lamp-y">灯光高度 <output id="lamp-y-value"></output></label
+            ><input
+              id="lamp-y"
+              type="range"
+              min="55"
+              max="490"
+              value="110"
+              data-entity="lamp"
+              data-field="y"
+            />
+            <label for="light">光源亮度 <output id="light-value">85%</output></label
+            ><input
+              id="light"
+              type="range"
+              min="25"
+              max="100"
+              value="85"
+              data-entity="lamp"
+              data-field="intensity"
+            />
+            <label for="softness">光源柔度 <output id="softness-value"></output></label
+            ><input
+              id="softness"
+              type="range"
+              min="0"
+              max="5"
+              step="0.1"
+              value="0.4"
+              data-entity="lamp"
+              data-field="softness"
+            />
+            <label for="light-color">灯光色调</label
+            ><select id="light-color" data-entity="lamp" data-field="color">
+              <option value="amber">琥珀暖灯</option>
+              <option value="moon">月白冷光</option>
+              <option value="rose">胭脂霞光</option>
+            </select>
+          </div>
+          <div id="panel-screen" class="object-panel" hidden>
+            <label for="screen-x">幕布横向 <output id="screen-x-value"></output></label
+            ><input
+              id="screen-x"
+              type="range"
+              min="-55"
+              max="55"
+              value="0"
+              data-entity="screen"
+              data-field="x"
+            />
+            <label for="screen-y">幕布纵向 <output id="screen-y-value"></output></label
+            ><input
+              id="screen-y"
+              type="range"
+              min="-25"
+              max="25"
+              value="0"
+              data-entity="screen"
+              data-field="y"
+            />
+            <label for="screen-depth">幕布距离 <output id="screen-depth-value"></output></label
+            ><input
+              id="screen-depth"
+              type="range"
+              min="900"
+              max="1000"
+              value="950"
+              data-entity="screen"
+              data-field="depth"
+            />
+            <label for="material">影幕材质</label
+            ><select id="material" data-entity="screen" data-field="material">
+              <option value="silk">暖绢 · 经典戏台</option>
+              <option value="paper">宣纸 · 素雅留白</option>
+              <option value="night">夜幕 · 月下演武</option>
+            </select>
+            <p class="tool-tip">移动幕布会平移投影；幕布离灯更远，影子更大。</p>
+          </div>
+          <div id="panel-puppet" class="object-panel">
+            <div class="adjustments">
+              <div class="section-label">签杆微调 <span>手动控制</span></div>
+              <label for="body">身体位置 <output id="body-value">居中</output></label
+              ><input
+                id="body"
+                type="range"
+                min="-220"
+                max="220"
+                value="0"
+                aria-label="身体水平位置"
+              /><label for="left">左侧手臂 <output id="left-value">自然</output></label
+              ><input
+                id="left"
+                type="range"
+                min="-90"
+                max="90"
+                value="0"
+                aria-label="画面左侧手臂抬起角度"
+              /><label for="right">右侧手臂 <output id="right-value">自然</output></label
+              ><input
+                id="right"
+                type="range"
+                min="-90"
+                max="90"
+                value="0"
+                aria-label="画面右侧手臂抬起角度"
+              />
+            </div>
+            <label for="puppet-depth">影偶离灯距离 <output id="puppet-depth-value"></output></label
+            ><input
+              id="puppet-depth"
+              type="range"
+              min="680"
+              max="880"
+              value="850"
+              data-entity="puppet"
+              data-field="depth"
+            />
+            <p class="tool-tip">
+              靠近灯，影子变大；靠近幕，影子变小。操作签杆也可以摆出自己的姿态。
+            </p>
+          </div>
+          <div id="panel-rod" class="object-panel" hidden>
+            <div class="rod-picker">
+              <button data-select="rod-left">左手签</button
+              ><button data-select="rod-body">主签</button
+              ><button data-select="rod-right">右手签</button>
+            </div>
+            <label for="rod-length">当前签杆长度 <output id="rod-length-value"></output></label
+            ><input id="rod-length" type="range" min="100" max="220" value="170" />
+            <label class="check-row" for="rod-visible"
+              ><input id="rod-visible" type="checkbox" checked />显示当前签杆</label
+            >
+            <p class="tool-tip">每根签杆独立关联影偶关节。拖动圆形手柄操纵，长度只影响手柄位置。</p>
+          </div>
+          <div class="action-section">
+            <div class="section-label">动作灵感 <span>点击播放 · 手动可打断</span></div>
+            <div class="action-grid" role="group" aria-label="选择预设动作"></div>
           </div>
           <div class="settings">
             <label class="toggle-row" for="show-rods"
@@ -166,9 +387,7 @@
                 class="switch"
                 aria-hidden="true"
               ></span></label
-            ><label for="light">幕布灯光 <output id="light-value">75%</output></label
-            ><input id="light" type="range" min="25" max="100" value="75" /><label for="speed"
-              >动作速度 <output id="speed-value">1.0×</output></label
+            ><label for="speed">动作速度 <output id="speed-value">1.0×</output></label
             ><input id="speed" type="range" min="25" max="175" value="100" step="5" />
           </div>
         </aside>

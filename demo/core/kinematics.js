@@ -3,7 +3,7 @@
   if (typeof module === 'object' && module.exports)
     module.exports = factory(require('./config.js'), require('./actions.js'));
   else Object.assign((root.ShadowTheatre ||= {}), factory(root.ShadowTheatre, root.ShadowTheatre));
-})(globalThis, function ({ CONFIG, GRIPS, clamp }, { ACTIONS }) {
+})(globalThis, function ({ CONFIG, clamp }, { ACTIONS }) {
   // Project unreachable targets onto the arm's reachable circle before solving.
   function solveArm(shoulder, target, flip, length = CONFIG.armLength) {
     const dx = target.x - shoulder.x,
@@ -23,6 +23,7 @@
   }
 
   function toWorld(point, pose) {
+    if (pose.facing === -1) point = { x: 1000 - point.x, y: point.y };
     const { origin } = CONFIG,
       radians = (pose.lean * Math.PI) / 180;
     return {
@@ -39,30 +40,32 @@
   }
 
   function getPose(state, actions = ACTIONS) {
-    const l = (state.liftL * Math.PI) / 180,
-      r = (state.liftR * Math.PI) / 180;
+    const puppet = state.scene.puppet;
+    const l = (puppet.liftL * Math.PI) / 180,
+      r = (puppet.liftR * Math.PI) / 180;
     const pose = {
-      x: CONFIG.origin.x + state.x,
+      x: CONFIG.origin.x + puppet.x,
       y: 0,
       lean: 0,
       step: 0,
+      facing: puppet.facing,
       left: { x: 420 - 110 * Math.cos(l), y: 295 - 110 * Math.sin(l) },
       right: { x: 555 + 110 * Math.cos(r), y: 295 - 110 * Math.sin(r) },
     };
     (actions.find((action) => action.id === state.action) || actions[0]).sample(pose, state.time);
+    pose.y += puppet.y;
     pose.arms = {
       left: solveArm(CONFIG.shoulders.left, pose.left, -1),
       right: solveArm(CONFIG.shoulders.right, pose.right, 1),
     };
     pose.left = pose.arms.left.hand;
     pose.right = pose.arms.right.hand;
-    const points = [pose.left, { x: 500, y: 310 }, pose.right];
-    pose.rods = GRIPS.map((grip, i) => {
-      const anchor = toWorld(points[i], pose);
+    const joints = { left: pose.left, body: { x: 500, y: 310 }, right: pose.right };
+    pose.rods = state.scene.rods.map((grip) => {
+      const anchor = toWorld(joints[grip.joint], pose);
       return {
         ...grip,
         anchor,
-        handle: { x: anchor.x + grip.offset, y: i === 1 ? 571 : anchor.y + 185 },
       };
     });
     return pose;
