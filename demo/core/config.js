@@ -11,7 +11,7 @@
     }),
     armLength: 85,
     limits: Object.freeze({
-      x: Object.freeze([-220, 220]),
+      x: Object.freeze([-360, 360]),
       liftL: Object.freeze([-90, 90]),
       liftR: Object.freeze([-90, 90]),
       speed: Object.freeze([0.25, 1.75]),

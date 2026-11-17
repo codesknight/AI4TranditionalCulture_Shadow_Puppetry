@@ -81,7 +81,7 @@ test('light, screen and puppet depth affect projection independently', () => {
 test('manual puppet changes interrupt animation, preserve preferences and clamp values', () => {
   let state = transition(initialState(), { type: 'SELECT_ACTION', id: 'dance' });
   state = transition(state, { type: 'UPDATE_OBJECT', id: 'puppet', patch: { x: 999 } });
-  assert.equal(state.scene.puppet.x, 220);
+  assert.equal(state.scene.puppet.x, 360);
   assert.equal(state.action, 'free');
   assert.equal(state.playing, false);
   state = transition(state, { type: 'UPDATE_OBJECT', id: 'lamp', patch: { intensity: 50 } });

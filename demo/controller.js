@@ -4,6 +4,8 @@
   ACTIONS,
   GRIPS,
   LEVELS,
+  CHAPTERS,
+  questProgress,
   findObject,
   createStore,
   getPose,
@@ -21,10 +23,13 @@
   const dispatch = (command) => store.dispatch(command);
   let drag = null,
     previousFrame = null,
-    best = 0;
+    best = 0,
+    questBest = 0;
   try {
     const stored = Number(localStorage.getItem('shadow-play-best'));
     best = Number.isFinite(stored) ? Math.max(0, stored) : 0;
+    const journeyStored = Number(localStorage.getItem('shadow-journey-best'));
+    questBest = Number.isFinite(journeyStored) ? Math.max(0, journeyStored) : 0;
   } catch {
     /* Storage is optional in file/private mode. */
   }
@@ -45,7 +50,107 @@
     }
     grid.append(button);
   }
+  function updateQuestHud(state) {
+    const quest = state.quest,
+      chapter = CHAPTERS[quest.chapter],
+      progress = questProgress(quest),
+      active = ['playing', 'paused'].includes(quest.status);
+    if (quest.score > questBest) {
+      questBest = quest.score;
+      try {
+        localStorage.setItem('shadow-journey-best', String(questBest));
+      } catch {
+        /* Optional. */
+      }
+    }
+    $('score').textContent = String(quest.score).padStart(4, '0');
+    $('best').textContent = String(questBest).padStart(4, '0');
+    $('round').textContent = `${quest.chapter + 1} / ${CHAPTERS.length}`;
+    $('timer').textContent = `${Math.ceil(quest.remaining)}s`;
+    $('challenge').textContent = '重启西游 ↻';
+    $('challenge').classList.toggle('active', true);
+    $('sandbox').classList.toggle('active', false);
+    $('alignment').classList.toggle('active', false);
+    $('pause-game').hidden = !active;
+    $('pause-game').textContent = quest.status === 'paused' ? '继续 ▶' : '暂停 Ⅱ';
+    $('mission-tag').textContent =
+      quest.status === 'won'
+        ? '三回功成 · 西行未止'
+        : quest.status === 'lost'
+          ? '本回失利 · 再战一次'
+          : chapter.subtitle;
+    $('mission-title').textContent =
+      quest.status === 'won'
+        ? `大圣归来！${quest.score} 分`
+        : quest.status === 'lost'
+          ? '胜败寻常，重整旗鼓'
+          : chapter.name;
+    $('mission-hint').textContent =
+      quest.status === 'paused' ? '西游已暂停，准备好后继续。' : chapter.objective;
+    $('match').textContent = '♥'.repeat(quest.health) + '♡'.repeat(3 - quest.health);
+    $('match').style.fontSize = '13px';
+    $('match-label').textContent = '法力';
+    const ratio = (progress.collected + progress.defeated) / (progress.total + progress.enemies);
+    $('hold-progress').style.width = `${ratio * 100}%`;
+    $('hold-track').setAttribute('aria-label', '本回目标进度');
+    $('hold-track').setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+    $('quest-objective').textContent = chapter.objective;
+    $('quest-items').textContent =
+      `${quest.chapter === 2 ? '芭蕉扇' : '仙桃'} ${progress.collected} / ${progress.total}`;
+    $('quest-enemies').textContent = `妖怪 ${progress.defeated} / ${progress.enemies}`;
+    if ($('quest-feedback').textContent !== quest.message)
+      $('quest-feedback').textContent = quest.message;
+    $('quest-next').hidden = !['interlude', 'lost', 'won'].includes(quest.status);
+    $('quest-next').textContent =
+      quest.status === 'interlude'
+        ? '继续西行 →'
+        : quest.status === 'lost'
+          ? '重试本回 ↻'
+          : '再踏西行 ↻';
+    $('playing-title').textContent = '齐天大圣 · 金箍棒在手';
+    $('playing-note').textContent = 'A / D 移动 · W 跳跃 · J 挥棒 · K 扇风';
+    $('attack').disabled = quest.attackCooldown > 0 || !['playing'].includes(quest.status);
+    $('fan').disabled = !quest.hasFan || quest.fanCooldown > 0 || quest.status !== 'playing';
+    $('fan-status').textContent = quest.hasFan
+      ? quest.fanCooldown > 0
+        ? `芭蕉扇回气中 · ${quest.fanCooldown.toFixed(1)}s`
+        : '芭蕉扇已就绪 · K 扇风'
+      : '火焰山可获得芭蕉扇';
+    $('stage').setAttribute('data-game', quest.status);
+    $('stage').setAttribute('data-chapter', chapter.id);
+  }
   function updateHud(state) {
+    const questActive = state.quest.status !== 'idle';
+    $('tools').setAttribute('data-quest', String(questActive));
+    $('stage').setAttribute('data-quest', String(questActive));
+    $('quest-help').hidden = !questActive;
+    $('quest-feedback').hidden = !questActive;
+    for (let i = 0; i < CHAPTERS.length; i++) {
+      $(`chapter-${i}`).classList.toggle('current', state.quest.chapter === i);
+      $(`chapter-${i}`).classList.toggle(
+        'completed',
+        state.quest.chapter > i || state.quest.status === 'won',
+      );
+    }
+    objectInputs.forEach((input) => {
+      input.disabled = questActive;
+    });
+    GRIPS.forEach((grip) => {
+      $(grip.id).disabled = questActive;
+    });
+    for (const id of ['play', 'reset']) $(id).disabled = questActive;
+    grid.querySelectorAll('[data-action]').forEach((button) => {
+      button.disabled = questActive;
+    });
+    if (questActive) {
+      updateQuestHud(state);
+      return;
+    }
+    $('quest-next').hidden = true;
+    $('attack').disabled = state.quest.attackCooldown > 0;
+    $('fan').disabled = true;
+    $('match').style.fontSize = '';
+    $('stage').setAttribute('data-chapter', 'mountain');
     const game = state.game,
       active = ['playing', 'paused'].includes(game.status);
     $('pause-game').hidden = !active;
@@ -65,12 +170,14 @@
         ? `${game.level + 1} / ${LEVELS.length}`
         : `— / ${LEVELS.length}`;
     $('timer').textContent = `${Math.ceil(game.remaining)}s`;
-    $('challenge').textContent = active
+    $('alignment').textContent = active
       ? '重新挑战 ↻'
       : game.status === 'idle'
         ? '开始闯关 →'
         : '再玩一次 ↻';
-    $('challenge').classList.toggle('active', game.status !== 'idle');
+    $('challenge').textContent = '踏上西游 →';
+    $('challenge').classList.toggle('active', false);
+    $('alignment').classList.toggle('active', game.status !== 'idle');
     $('sandbox').classList.toggle('active', game.status === 'idle');
     $('mission-tag').textContent = active
       ? `第 ${game.level + 1} 幕 · ${game.combo ? `${game.combo} 连击` : '影子对齐'}`
@@ -78,14 +185,14 @@
         ? '五幕通关！'
         : game.status === 'lost'
           ? '时间到 · 再试一次'
-          : '自由探索';
+          : '西游序章 · 自由戏台';
     $('mission-title').textContent = active
       ? LEVELS[game.level].name
       : game.status === 'won'
         ? `好身手！你获得了 ${game.score} 分`
         : game.status === 'lost'
           ? `这次拿到 ${game.score} 分，下一场更精彩`
-          : '把幕后变成你的游乐场';
+          : '做一回大圣，走一段西行';
     $('mission-hint').textContent =
       game.status === 'paused'
         ? '已暂停计时。准备好后，点击「继续」重新开演。'
@@ -95,11 +202,12 @@
             : `${LEVELS[game.level].hint} 对齐青色影子并保持 0.65 秒。`
           : game.status === 'won'
             ? `五幕连击完成，额外获得 ${game.bonus} 分时间奖励！再玩一场，挑战更快通关。`
-            : '拖动灯和影偶；A/D 移动，W 跳跃，F 转身。点选四类对象，发现影子的变化。';
+            : '点击「踏上西游」开始三回冒险。也可在自由戏台拖动光源、影幕与签杆，练一练身手。';
     $('match').textContent = active ? `${game.match}%` : game.status === 'won' ? '★' : '✦';
     $('match-label').textContent = active ? '匹配度' : game.status === 'won' ? 'BRAVO' : 'PLAY';
     $('hold-progress').style.width = `${Math.min(100, (game.hold / 0.65) * 100)}%`;
     $('hold-track').setAttribute('aria-valuenow', String(Math.round((game.hold / 0.65) * 100)));
+    $('hold-track').setAttribute('aria-label', '保持对齐进度');
     $('stage').setAttribute('data-game', game.status);
   }
   function updateView(state, previous) {
@@ -173,6 +281,7 @@
     $('stage').setAttribute('data-material', scene.screen.material);
     $('stage').setAttribute('data-light', scene.lightSource.color);
     $('magnification').textContent = `${projection(scene).magnification.toFixed(2)}×`;
+    if (state.quest.status !== 'idle') updateQuestHud(state);
   }
   function cancelDrag() {
     const active = drag;
@@ -212,7 +321,10 @@
     ['jump', 'JUMP'],
     ['flip', 'FLIP'],
     ['reset-scene', 'RESET_SCENE'],
-    ['challenge', 'START_GAME'],
+    ['challenge', 'START_QUEST'],
+    ['alignment', 'START_GAME'],
+    ['attack', 'ATTACK'],
+    ['fan', 'FAN'],
     ['pause-game', 'PAUSE_GAME'],
     ['sandbox', 'EXIT_GAME'],
   ]) {
@@ -222,13 +334,36 @@
       dispatch({ type });
     });
   }
-  document.querySelectorAll('[data-move]').forEach((button) =>
-    button.addEventListener('click', () =>
-      updateObject('puppet', {
-        x: store.getState().scene.puppet.x + Number(button.dataset.move),
-      }),
-    ),
-  );
+  $('quest-next').addEventListener('click', () => {
+    cancelDrag();
+    keys.clear();
+    const status = store.getState().quest.status;
+    dispatch({
+      type:
+        status === 'interlude' ? 'NEXT_QUEST' : status === 'lost' ? 'RETRY_QUEST' : 'START_QUEST',
+    });
+  });
+  document
+    .querySelectorAll('[data-move]')
+    .forEach((button) =>
+      button.addEventListener('click', () =>
+        dispatch({ type: 'MOVE', dx: Number(button.dataset.move) }),
+      ),
+    );
+  document.querySelectorAll('[data-move]').forEach((button) => {
+    const key = Number(button.dataset.move) < 0 ? 'a' : 'd';
+    button.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      keys.add(key);
+      button.setPointerCapture(event.pointerId);
+    });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
+      button.addEventListener(type, (event) => {
+        keys.delete(key);
+        if (button.hasPointerCapture(event.pointerId))
+          button.releasePointerCapture(event.pointerId);
+      });
+  });
   $('speed').addEventListener('input', (event) =>
     dispatch({ type: 'SET_SPEED', value: Number(event.target.value) / 100 }),
   );
@@ -250,6 +385,7 @@
       : null;
   }
   svg.addEventListener('pointerdown', (event) => {
+    if (store.getState().quest.status !== 'idle') return;
     const handle = event.target.closest('[data-object]');
     if (!handle || drag || (event.button !== undefined && event.button !== 0)) return;
     const state = store.getState(),
@@ -334,13 +470,13 @@
       keys.add(key);
       event.preventDefault();
     }
-    if (!event.repeat && ['w', 'f'].includes(key)) {
+    if (!event.repeat && ['w', 'f', 'j', 'k'].includes(key)) {
       event.preventDefault();
-      dispatch({ type: key === 'w' ? 'JUMP' : 'FLIP' });
+      dispatch({ type: { w: 'JUMP', f: 'FLIP', j: 'ATTACK', k: 'FAN' }[key] });
     }
     if (event.code === 'Space' && event.target === document.body) {
       event.preventDefault();
-      dispatch({ type: 'TOGGLE_PLAY' });
+      dispatch({ type: store.getState().quest.status === 'idle' ? 'TOGGLE_PLAY' : 'JUMP' });
     }
   });
   document.addEventListener('keyup', (event) => keys.delete(event.key?.toLowerCase()));
@@ -361,7 +497,11 @@
         const [field, speed] = keyFields[key];
         patch[field] = (patch[field] ?? puppet[field]) + speed * Math.min(seconds, 0.05);
       }
-      updateObject('puppet', patch);
+      if (patch.x !== undefined) {
+        dispatch({ type: 'MOVE', dx: patch.x - puppet.x });
+        delete patch.x;
+      }
+      if (Object.keys(patch).length) updateObject('puppet', patch);
     }
     dispatch({ type: 'TICK', seconds, hidden: document.hidden });
     requestAnimationFrame(tick);

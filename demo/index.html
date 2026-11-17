@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#251e1b" />
     <meta
       name="description"
-      content="拖动三根操纵杆，让一位皮影武生在灯影间活动。可交互的皮影动作展示。"
+      content="执起金箍棒，踏上皮影西游路。花果山、白骨岭与火焰山三章互动冒险。"
     />
-    <title>掌中光影 · 皮影互动戏台</title>
+    <title>影行西游 · 猴王三回记</title>
     <link rel="stylesheet" href="style.css" />
     <script src="core/config.js" defer></script>
     <script src="core/actions.js" defer></script>
@@ -16,34 +16,68 @@
     <script src="core/kinematics.js" defer></script>
     <script src="core/projection.js" defer></script>
     <script src="core/game.js" defer></script>
+    <script src="core/chapters.js" defer></script>
+    <script src="core/quest.js" defer></script>
     <script src="core/model.js" defer></script>
+    <script src="core/journey-view.js" defer></script>
     <script src="core/renderer.js" defer></script>
     <script src="controller.js" defer></script>
   </head>
   <body>
     <header class="masthead">
       <a class="brand" href="./"
-        ><span class="seal">影</span><span>掌中光影<small>SHADOW PUPPET THEATRE</small></span></a
-      ><span class="edition">中国传统艺术 · 交互实验 <span>VOL. 01</span></span
+        ><span class="seal">影</span><span>影行西游<small>JOURNEY THROUGH SHADOWS</small></span></a
+      ><span class="edition">皮影奇境 · 猴王三回记 <span>CHAPTER 01—03</span></span
       ><a class="about-link" href="#about">关于皮影 <span>↗</span></a>
     </header>
     <main>
       <section class="intro">
         <div>
-          <p class="eyebrow">SHADOW PLAYGROUND · 光影游乐场</p>
-          <h1>这场戏，<em>由你来玩。</em></h1>
+          <p class="eyebrow">A SHADOW JOURNEY TO THE WEST</p>
+          <h1>一棒破万难，<em>影里踏西行。</em></h1>
           <p class="lead">
-            拖动灯，牵起签，让影子变大、跳起、转身。<br class="mobile-break" />自由造一场戏，或挑战
-            75 秒影子闯关。
+            披一身皮影，做一回大圣。<br class="mobile-break" />跃花果，战白骨，借一阵清风越火焰。
           </p>
         </div>
-        <div class="intro-note"><span class="mini-line"></span>以手为引<br />以光成戏</div>
+        <div class="intro-note"><span class="mini-line"></span>八十一难<br />从此开篇</div>
+      </section>
+      <section class="chapter-map" aria-label="西游三章">
+        <article id="chapter-0" class="current">
+          <span>壹</span>
+          <div>
+            <small>THE BEGINNING</small>
+            <h2>花果山</h2>
+            <p>灵猴初试金箍棒</p>
+          </div>
+          <b>01</b>
+        </article>
+        <i aria-hidden="true">···</i>
+        <article id="chapter-1">
+          <span>贰</span>
+          <div>
+            <small>THE MIST</small>
+            <h2>白骨岭</h2>
+            <p>一棒识破白骨妖</p>
+          </div>
+          <b>02</b>
+        </article>
+        <i aria-hidden="true">···</i>
+        <article id="chapter-2">
+          <span>叁</span>
+          <div>
+            <small>THE FLAME</small>
+            <h2>火焰山</h2>
+            <p>借扇乘风过山口</p>
+          </div>
+          <b>03</b>
+        </article>
       </section>
       <section class="game-hud" aria-label="游戏状态">
         <div class="mode-switch">
           <button id="sandbox" class="mode-tab active">自由戏台</button
-          ><button id="challenge" class="mode-tab">开始闯关 <span>→</span></button
-          ><button id="pause-game" class="mode-tab" hidden>暂停 Ⅱ</button>
+          ><button id="challenge" class="mode-tab">踏上西游 <span>→</span></button
+          ><button id="alignment" class="mode-tab">影子练功</button>
+          <button id="pause-game" class="mode-tab" hidden>暂停 Ⅱ</button>
         </div>
         <div class="hud-stat"><span>得分</span><strong id="score">0000</strong></div>
         <div class="hud-stat"><span>关卡</span><strong id="round">— / 5</strong></div>
@@ -91,7 +125,7 @@
               role="group"
               aria-labelledby="stage-title stage-desc"
             >
-              <title id="stage-title">可操纵的皮影武生</title>
+              <title id="stage-title">西游皮影冒险戏台</title>
               <desc id="stage-desc">
                 使用下方三个滑杆或拖动戏台上的圆形签杆手柄，控制身体与左右手；也可选择预设动作。
               </desc>
@@ -172,6 +206,7 @@
                   <text x="907" y="55" text-anchor="middle" class="object-label">▣ 影幕</text>
                 </g>
               </g>
+              <g id="quest-world" pointer-events="none"></g>
               <g id="target-ghost" class="target-ghost" pointer-events="none"></g>
               <g
                 id="puppet"
@@ -197,11 +232,11 @@
               </g>
               <g id="effects" pointer-events="none"></g>
               <text x="500" y="613" class="svg-hint" text-anchor="middle">
-                A / D 移动 · W 跳跃 · F 转身 · Q / E 左手 · O / P 右手
+                A / D 移动 · W 跳跃 · J 挥棒 · K 扇风 · F 转身
               </text>
             </svg>
             <div class="stage-caption">
-              <span>武生 · 你的光影分身</span><span>投影倍率 <b id="magnification">1.12×</b></span>
+              <span>齐天大圣 · 原创皮影</span><span>投影倍率 <b id="magnification">1.12×</b></span>
             </div>
           </div>
           <div class="playbar">
@@ -217,14 +252,29 @@
             ><button data-move="25" aria-label="向右移动">→ <span>右移</span></button
             ><button id="jump">↑ <span>跳起来</span></button
             ><button id="flip">⇄ <span>转个身</span></button
+            ><button id="attack">✧ <span>挥棒 J</span></button
+            ><button id="fan">彡 <span>扇风 K</span></button
             ><button id="reset-scene" class="restore-scene">↺ <span>重置场景</span></button>
           </div>
+          <div class="quest-feedback" id="quest-feedback" aria-live="polite" hidden></div>
+          <div class="quest-next-row"><button id="quest-next" hidden>继续西行 →</button></div>
         </div>
-        <aside class="controls">
+        <aside class="controls" id="tools">
           <div class="panel-heading">
             <span class="eyebrow">YOUR STAGE, YOUR RULES</span>
             <h2>幕后工具箱</h2>
             <p>四个独立对象，搭出自己的光影世界。</p>
+          </div>
+          <div id="quest-help" class="quest-help" hidden>
+            <span class="eyebrow">MONKEY KING · FIELD NOTES</span>
+            <h3>大圣行囊</h3>
+            <p id="quest-objective"></p>
+            <div class="quest-objectives">
+              <span id="quest-items"></span><span id="quest-enemies"></span>
+            </div>
+            <p>金箍棒有出招间隔，朝向妖怪再挥棒；仙桃可补一格法力。跳跃能避开碰撞与山火。</p>
+            <p id="fan-status">火焰山可获得芭蕉扇</p>
+            <p>本回完成后走到右侧山门。西游模式固定舞台参数，自由戏台中仍可编辑四类对象。</p>
           </div>
           <div class="object-tabs" role="group" aria-label="选择场景对象">
             <button data-select="lamp">☀<span>光源</span></button
@@ -328,8 +378,8 @@
               ><input
                 id="body"
                 type="range"
-                min="-220"
-                max="220"
+                min="-360"
+                max="360"
                 value="0"
                 aria-label="身体水平位置"
               /><label for="left">左侧手臂 <output id="left-value">自然</output></label
@@ -415,7 +465,7 @@
         </article>
       </section>
       <p class="demo-note">
-        本页为交互原型。影人是原创风格化示意，关节运动经简化；预设动作不代表特定流派的传统表演程式。<a
+        本页为原创皮影风交互原型，西游剧情为游戏化自由改编，关节、投影与战斗判定经简化；预设动作不代表特定流派的传统表演程式。<a
           href="https://www.ihchina.cn/art/detail/id/18619.html"
           target="_blank"
           rel="noopener noreferrer"
@@ -424,7 +474,7 @@
       </p>
     </main>
     <footer>
-      <span>掌中光影 <span class="footer-dot">·</span> 让传统在指尖延续</span
+      <span>影行西游 <span class="footer-dot">·</span> 让传统在指尖延续</span
       ><span>一方幕布，万般故事。</span>
     </footer>
   </body>

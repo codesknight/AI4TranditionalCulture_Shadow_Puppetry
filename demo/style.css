@@ -1253,3 +1253,362 @@ footer {
     opacity: 0;
   }
 }
+
+/* Journey to the West: paper-cut chapters and playable story stage. */
+.intro h1 {
+  font-size: 44px;
+}
+.intro {
+  padding-top: 37px;
+  padding-bottom: 28px;
+}
+.chapter-map {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.chapter-map article {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 19px 20px;
+  border: 1px solid #d9c9aa;
+  background: #eae0ca70;
+  overflow: hidden;
+}
+.chapter-map article > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 50px;
+  font:
+    25px 'SimSun',
+    serif;
+  color: #a38450;
+  border: 1px solid #b8a073;
+  transform: rotate(-5deg);
+}
+.chapter-map small {
+  font: 8px Georgia;
+  letter-spacing: 2px;
+  color: #9c8662;
+}
+.chapter-map h2 {
+  font:
+    22px 'SimSun',
+    serif;
+  margin: 5px 0 5px;
+  letter-spacing: 4px;
+}
+.chapter-map p {
+  font-size: 10px;
+  color: #998364;
+  margin: 0;
+}
+.chapter-map b {
+  position: absolute;
+  right: 12px;
+  bottom: -11px;
+  font: 80px Georgia;
+  opacity: 0.05;
+}
+.chapter-map article.current {
+  background: #e5d6b6;
+  border-color: #ad8042;
+  box-shadow: inset 0 0 0 3px #eee1c380;
+}
+.chapter-map article.current > span {
+  background: #a43b29;
+  color: #f5dc9e;
+  border-color: #a43b29;
+}
+.chapter-map article.completed > span {
+  background: #587b5e;
+  border-color: #587b5e;
+}
+.chapter-map > i {
+  font-style: normal;
+  color: #bba57b;
+  letter-spacing: 3px;
+}
+.game-hud {
+  gap: 25px;
+}
+.mode-tab {
+  padding: 12px 13px;
+  font-size: 11px;
+}
+#challenge {
+  background: #a33e29;
+  color: #ffe8b1;
+}
+#challenge:hover {
+  background: #893321;
+}
+.quest-label {
+  font:
+    15px 'SimSun',
+    serif;
+  fill: #755635;
+  letter-spacing: 2px;
+}
+.quest-label.small {
+  font:
+    10px 'Microsoft YaHei',
+    sans-serif;
+  letter-spacing: 0;
+}
+.quest-feedback {
+  margin: 0 24px 15px;
+  padding: 12px 15px;
+  border-left: 2px solid #bf9859;
+  background: #3b3429;
+  color: #d9c5a0;
+  font-size: 11px;
+  line-height: 1.8;
+  min-height: 43px;
+}
+.quest-next-row {
+  padding: 0 24px 20px;
+}
+.quest-next-row:has(button[hidden]) {
+  padding: 0;
+}
+.quest-next-row button {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #d6ad64;
+  border-radius: 3px;
+  background: #b44e2e;
+  color: #ffe7b8;
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+.quest-help h3 {
+  font:
+    25px 'SimSun',
+    serif;
+  margin: 13px 0 20px;
+  letter-spacing: 3px;
+}
+.quest-help p {
+  font-size: 11px;
+  line-height: 2;
+  color: #8b7655;
+}
+.quest-objectives {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 22px 0;
+}
+.quest-objectives span {
+  padding: 16px 10px;
+  border: 1px solid #cabb9a;
+  background: #eee3ca;
+  color: #886330;
+  text-align: center;
+  font:
+    14px 'SimSun',
+    serif;
+}
+#fan-status {
+  color: #587653;
+  border-bottom: 1px solid #d9c9aa;
+  padding-bottom: 20px;
+}
+.quest-help:after {
+  content: '一双手，万里路。';
+  display: block;
+  margin-top: 40px;
+  padding: 25px 12px;
+  border-top: 1px solid #d8c6a4;
+  color: #ae956c;
+  font:
+    20px 'SimSun',
+    serif;
+  letter-spacing: 4px;
+  text-align: center;
+}
+#tools[data-quest='true'] .object-tabs,
+#tools[data-quest='true'] .object-summary,
+#tools[data-quest='true'] .object-panel,
+#tools[data-quest='true'] .action-section,
+#tools[data-quest='true'] .settings {
+  display: none;
+}
+.stage[data-quest='true'] .scenery,
+.stage[data-quest='true'] #screen-object,
+.stage[data-quest='true'] #light-source,
+.stage[data-quest='true'] #ground-shadow {
+  display: none;
+}
+.stage[data-quest='true'] #puppet {
+  cursor: default;
+}
+.stage[data-quest='true'] {
+  min-height: 350px;
+}
+.stage[data-chapter='bones'][data-quest='true'] .quest-label {
+  fill: #edf0cf;
+}
+.quest-enemy {
+  filter: drop-shadow(2px 3px 2px #40261533);
+}
+.quest-enemy.enemy-hit {
+  filter: brightness(1.7) drop-shadow(0 0 7px #ffd373);
+}
+.quest-fire {
+  animation: flame 700ms ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: bottom;
+}
+.portal-ready {
+  filter: drop-shadow(0 0 8px #d0cb77);
+}
+.quest-wind {
+  animation: wind 600ms ease-in-out infinite alternate;
+}
+.touch-controls button:disabled,
+.playbar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+#attack {
+  border-color: #b58a45;
+  color: #f9d58c;
+}
+#fan {
+  border-color: #5a8768;
+  color: #abd0aa;
+}
+.touch-controls .restore-scene {
+  font-size: 12px;
+}
+.stage[data-game='lost'] {
+  box-shadow: inset 0 0 60px #853e3988;
+}
+.stage[data-game='interlude'] {
+  box-shadow: inset 0 0 60px #e7bd6d88;
+}
+@keyframes flame {
+  to {
+    transform: scaleX(0.85) scaleY(1.08);
+  }
+}
+@keyframes wind {
+  to {
+    transform: translateX(14px);
+  }
+}
+@media (max-width: 1050px) {
+  .game-hud {
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .mode-switch {
+    flex-wrap: wrap;
+  }
+  .intro h1 {
+    font-size: 36px;
+  }
+  .chapter-map {
+    gap: 10px;
+  }
+  .chapter-map article {
+    padding: 15px 13px;
+    gap: 10px;
+  }
+  .chapter-map article > span {
+    width: 32px;
+    height: 42px;
+  }
+  .chapter-map h2 {
+    font-size: 20px;
+    letter-spacing: 2px;
+  }
+  .chapter-map small {
+    font-size: 7px;
+  }
+}
+@media (max-width: 760px) {
+  .intro h1 {
+    font-size: 29px;
+    line-height: 1.5;
+  }
+  .chapter-map {
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .chapter-map > i {
+    display: none;
+  }
+  .chapter-map article {
+    padding: 12px 8px;
+    display: block;
+    text-align: center;
+  }
+  .chapter-map article > span {
+    margin: 0 auto 9px;
+    width: 28px;
+    height: 32px;
+    font-size: 19px;
+  }
+  .chapter-map h2 {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+  .chapter-map small {
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+  .chapter-map p {
+    font-size: 8px;
+    line-height: 1.6;
+  }
+  .chapter-map b {
+    font-size: 54px;
+  }
+  .mode-tab {
+    padding: 11px 6px;
+    font-size: 10px;
+  }
+  .mode-switch {
+    gap: 4px;
+  }
+  .quest-help:after {
+    display: none;
+  }
+  .quest-help p {
+    font-size: 11px;
+  }
+  .quest-feedback {
+    margin: 0 14px 12px;
+    font-size: 10px;
+  }
+  .quest-next-row {
+    padding: 0 14px 15px;
+  }
+  .touch-controls {
+    flex-wrap: wrap;
+  }
+  .touch-controls button {
+    flex: 1 0 26%;
+    padding: 11px 3px;
+  }
+  .touch-controls .restore-scene {
+    flex-basis: 100%;
+  }
+  .stage[data-quest='true'] {
+    min-height: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest-fire,
+  .quest-wind {
+    animation: none;
+  }
+}

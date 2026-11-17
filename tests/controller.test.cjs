@@ -140,17 +140,7 @@ function setup() {
       }
     },
   });
-  for (const file of [
-    'core/config.js',
-    'core/actions.js',
-    'core/entities.js',
-    'core/kinematics.js',
-    'core/projection.js',
-    'core/game.js',
-    'core/model.js',
-    'core/renderer.js',
-    'controller.js',
-  ]) {
+  for (const file of [...html.matchAll(/<script src="([^"]+)"/g)].map((match) => match[1])) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../demo', file), 'utf8'), context, {
       filename: file,
     });
@@ -192,7 +182,7 @@ test('dragging clamps body position, ignores a second pointer and releases captu
   svg.emit('pointermove', { clientX: 1000, clientY: 571, pointerId: 2 });
   assert.equal(element('body').value, 0);
   svg.emit('pointermove', { clientX: 1000, clientY: 571, pointerId: 1 });
-  assert.equal(element('body').value, 220);
+  assert.equal(element('body').value, 360);
   svg.emit('pointerup', { pointerId: 1 });
   assert.equal(svg.hasPointerCapture(1), false);
 });
@@ -251,7 +241,7 @@ test('lamp and screen drag use scene coordinates and release capture on mode cha
   svg.emit('pointermove', { clientX: 300, clientY: 160, pointerId: 5 });
   assert.equal(element('lamp-x').value, 300);
   assert.equal(element('lamp-y').value, 160);
-  element('challenge').emit('click');
+  element('alignment').emit('click');
   assert.equal(svg.hasPointerCapture(5), false);
   assert.equal(element('lamp-x').value, 180);
   const screen = {
@@ -292,7 +282,7 @@ test('UI controls can complete all five levels, pause, restart and exit', () => 
   const { LEVELS } = require('../demo/core/game.js');
   const { element, frame } = setup();
   let now = 0;
-  element('challenge').emit('click');
+  element('alignment').emit('click');
   frame(now);
   frame((now += 50));
   element('pause-game').emit('click');
@@ -320,8 +310,54 @@ test('UI controls can complete all five levels, pause, restart and exit', () => 
   assert.equal(element('match-label').textContent, 'BRAVO');
   assert.equal(element('round').textContent, '5 / 5');
   assert.equal(element('target-ghost').innerHTML, '');
-  element('challenge').emit('click');
+  element('alignment').emit('click');
   assert.equal(element('score').textContent, '0000');
   element('sandbox').emit('click');
-  assert.equal(element('mission-tag').textContent, '自由探索');
+  assert.equal(element('mission-tag').textContent, '西游序章 · 自由戏台');
+});
+
+test('Journey controls start a themed chapter, move, strike an enemy and retry after timeout', () => {
+  const { element, document, frame } = setup();
+  let now = 0;
+  element('challenge').emit('click');
+  assert.equal(element('round').textContent, '1 / 3');
+  assert.equal(element('quest-help').hidden, false);
+  assert.equal(element('body').disabled, true);
+  assert.match(element('quest-world').innerHTML, /quest-enemy/);
+  document.emit('keydown', { key: 'd', target: document.body, preventDefault() {} });
+  frame(now);
+  for (let i = 0; i < 40; i++) frame((now += 25));
+  document.emit('keyup', { key: 'd' });
+  assert.equal(element('body').value, -160);
+  document.emit('keydown', { key: 'j', target: document.body, preventDefault() {} });
+  frame((now += 25));
+  assert.equal(element('quest-enemies').textContent, '妖怪 1 / 2');
+  element('pause-game').emit('click');
+  const timer = element('timer').textContent;
+  frame((now += 1000));
+  assert.equal(element('timer').textContent, timer);
+  element('pause-game').emit('click');
+  frame((now += 91000));
+  assert.equal(element('mission-title').textContent, '胜败寻常，重整旗鼓');
+  assert.equal(element('quest-next').hidden, false);
+  element('quest-next').emit('click');
+  assert.equal(element('timer').textContent, '90s');
+  assert.equal(element('body').value, -320);
+  element('sandbox').emit('click');
+  assert.equal(element('quest-help').hidden, true);
+  assert.equal(element('body').disabled, false);
+});
+
+test('touch movement buttons hold and release without leaving a stuck direction', () => {
+  const { element, moves, frame } = setup();
+  element('challenge').emit('click');
+  let now = 0;
+  moves[1].emit('pointerdown', { pointerId: 9, preventDefault() {} });
+  frame(now);
+  frame((now += 50));
+  assert.equal(element('body').value, -312);
+  moves[1].emit('pointerup', { pointerId: 9 });
+  frame((now += 50));
+  assert.equal(element('body').value, -312);
+  assert.equal(moves[1].hasPointerCapture(9), false);
 });

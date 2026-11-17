@@ -46,6 +46,7 @@
     return {
       id: 'puppet',
       type: 'puppet',
+      character: 'wukong',
       x: 0,
       y: 0,
       velocityY: 0,

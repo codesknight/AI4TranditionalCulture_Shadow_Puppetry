@@ -24,6 +24,8 @@
 
   function toWorld(point, pose) {
     if (pose.facing === -1) point = { x: 1000 - point.x, y: point.y };
+    const scale = pose.scale || 1;
+    point = { x: 500 + (point.x - 500) * scale, y: 510 + (point.y - 510) * scale };
     const { origin } = CONFIG,
       radians = (pose.lean * Math.PI) / 180;
     return {
@@ -49,10 +51,15 @@
       lean: 0,
       step: 0,
       facing: puppet.facing,
+      scale: state.quest && state.quest.status !== 'idle' ? 0.5 : 1,
+      attack: state.quest?.attackTime || 0,
+      character: puppet.character,
       left: { x: 420 - 110 * Math.cos(l), y: 295 - 110 * Math.sin(l) },
       right: { x: 555 + 110 * Math.cos(r), y: 295 - 110 * Math.sin(r) },
     };
     (actions.find((action) => action.id === state.action) || actions[0]).sample(pose, state.time);
+    if (state.quest?.walkTime > 0) pose.step = Math.sin(state.quest.elapsed * 12) * 0.7;
+    if (pose.attack > 0) pose.right = { x: 660, y: 235 };
     pose.y += puppet.y;
     pose.arms = {
       left: solveArm(CONFIG.shoulders.left, pose.left, -1),
