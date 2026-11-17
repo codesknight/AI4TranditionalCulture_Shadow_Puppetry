@@ -16,7 +16,8 @@
 - 自动测试：13 项通过、0 项失败；核心测试 8 项、控制器测试 5 项。
 - 覆盖：注册动作几何、固定臂长、IK 不可达/重合边界、非法输入和限值、暂停/隐藏/帧间隔、设置与归位、不可变快照和取消订阅、新动作扩展、坐标与拖动、脚本初始化、稳定手柄、指针互斥/释放、手动打断动画、签杆显隐。
 - 资源：检查 HTML 声明的本地脚本与样式存在；构建复制全部模块并移除旧入口 `dist/app.js`。
-- CI：已配置推送/PR 检查；本地通过不等于 GitHub 托管任务已通过，远程执行结果另行核实。
+- CI：提交 `576cbe3` 的 GitHub Actions 已完成并成功，覆盖 Node.js 22 环境下的依赖安装、格式/语法/资源检查、13 项测试及构建。[执行记录](https://github.com/codesknight/AI4TranditionalCulture_Shadow_Puppetry/actions/runs/44052111932)。
+- 发布：对应代码版本 `576cbe3` 已更新到[在线 Demo](https://shadow-puppetry-studio.daintycabin4098.chatgpt.site)，Sites 返回 `succeeded`。发布成功不等于浏览器验收通过。
 - 限制：DOM 替身无法证明浏览器真实焦点、指针捕获、响应式布局或触摸正确。视觉验收待办如下。
 
 ### 待执行的浏览器验收
