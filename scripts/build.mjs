@@ -1,7 +1,7 @@
-import { mkdir, copyFile } from 'node:fs/promises';
+import { mkdir, cp, rm } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 await mkdir(new URL('dist/', root), { recursive: true });
-for (const file of ['index.html', 'style.css', 'app.js']) {
-  await copyFile(new URL(`demo/${file}`, root), new URL(`dist/${file}`, root));
-}
+await cp(new URL('demo/', root), new URL('dist/', root), { recursive: true });
+// Remove the previous entry point so old deploy artifacts cannot mask missing references.
+await rm(new URL('dist/app.js', root), { force: true });
 console.log('Static demo ready in dist/');

@@ -6,6 +6,8 @@
 
 - [皮影戏基础常识与背景知识](docs/皮影戏基础常识与背景知识.md)：定义、历史、制作、地方特色及参考来源。
 - [版本管理约定](docs/版本管理约定.md)：分支、提交与日常同步方式。
+- [架构设计](docs/架构设计.md)：模块职责、设计方式、数据结构与扩展方法。
+- [项目日志](docs/logs/README.md)：需求、开发、测试及 Bug 排查记录。
 
 ## 皮影动作展示 Demo
 
@@ -18,14 +20,16 @@
 
 影人为原创 SVG 风格化示意，使用简化的二维关节运动，不代表特定流派的传统程式。Demo 不含唱腔和音乐。
 
-开发检查与静态打包（需要 Node.js 18 或更新版本）：
+开发检查与静态打包（推荐 Node.js 22，CI 使用该版本）：
 
 ```bash
-npm test
-npm run build
+npm ci
+npm run verify
 ```
 
-打包结果位于 `dist/`。也可在仓库根目录运行 `python -m http.server 8765`，访问 `http://localhost:8765/demo/`。测试覆盖动作几何和主要控制逻辑，不替代浏览器视觉与触摸验证。
+运行时无需依赖；`npm ci` 安装的 Prettier 仅用于开发期格式检查。`verify` 包含格式、语法与本地资源检查、测试、构建。需要格式化时运行 `npm run format`。
+
+打包结果位于 `dist/`。也可在仓库根目录运行 `python -m http.server 8765`，访问 `http://localhost:8765/demo/`。测试覆盖动作几何和主要控制逻辑，不替代浏览器视觉与触摸验证。新增动作在 `demo/core/actions.js` 注册，详见架构设计。
 
 ## 目录
 
