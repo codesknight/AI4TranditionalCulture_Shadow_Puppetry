@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#251e1b">
+  <meta name="description" content="拖动三根操纵杆，让一位皮影武生在灯影间活动。可交互的皮影动作展示。">
+  <title>掌中光影 · 皮影互动戏台</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="masthead"><a class="brand" href="./"><span class="seal">影</span><span>掌中光影<small>SHADOW PUPPET THEATRE</small></span></a><span class="edition">中国传统艺术 · 交互实验 <span>VOL. 01</span></span><a class="about-link" href="#about">关于皮影 <span>↗</span></a></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">一幕，一灯，一双手</p><h1>让光影，<em>动起来。</em></h1><p class="lead">走到幕后来，牵动手中的签杆。<br class="mobile-break">一抬手、一转身，故事从你的指尖开始。</p></div><div class="intro-note"><span class="mini-line"></span>以手为引<br>以光成戏</div></section>
+    <section class="studio" aria-label="皮影互动戏台">
+      <div class="theatre-column"><div class="stage-heading"><span><i class="live-dot"></i> 光影戏台</span><span id="mode-label" aria-live="polite">自由操偶</span></div>
+        <div class="stage" id="stage"><div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div><span class="stage-inscription">灯下乾坤 · 指间天地</span>
+          <svg id="theatre" viewBox="0 0 1000 630" role="img" aria-labelledby="stage-title stage-desc">
+            <title id="stage-title">可操纵的皮影武生</title><desc id="stage-desc">使用下方三个滑杆或拖动戏台上的圆形签杆手柄，控制身体与左右手；也可选择预设动作。</desc>
+            <defs>
+              <pattern id="leather" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M7 1 13 7 7 13 1 7Z" fill="none" stroke="#f9d98e" stroke-width="1.2"/><circle cx="7" cy="7" r="1.6" fill="#f8db91"/></pattern>
+              <pattern id="scale" width="22" height="18" patternUnits="userSpaceOnUse"><path d="M0 0Q11 20 22 0M-11 9Q0 29 11 9M11 9Q22 29 33 9" stroke="#e9b75f" stroke-width="1.6" fill="none"/></pattern>
+              <filter id="puppet-shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#5e2715" flood-opacity=".28"/></filter>
+              <filter id="floor-blur"><feGaussianBlur stdDeviation="7"/></filter>
+            </defs>
+            <g class="scenery" fill="none" stroke="#987744" stroke-width="1.4" opacity=".2"><path d="M50 410Q90 380 140 410T230 410M50 418H230M770 410Q810 380 860 410T950 410M770 418H950"/><path d="M70 395V320H210V395M60 320H220L195 303H85ZM90 303L140 279 190 303M95 338V390M140 338V390M185 338V390M800 395V320H930V395M790 320H940L920 303H810ZM820 303L865 279 910 303M820 338V390M865 338V390M910 338V390"/><path d="M80 185q25-25 50 0q0-35 35-24q30-20 46 10q35-5 35 18H80M780 210q15-24 40-12q20-35 42-10q30-14 47 22Z"/></g>
+            <ellipse id="ground-shadow" cx="500" cy="510" rx="110" ry="11" fill="#673515" opacity=".16" filter="url(#floor-blur)"/>
+            <path d="M45 515H955" stroke="#9b7645" opacity=".22"/>
+            <g id="puppet" filter="url(#puppet-shadow)"></g>
+            <g id="rods"></g><g id="handles"></g>
+            <text x="500" y="613" class="svg-hint" text-anchor="middle">拖动三个圆形手柄，试着操纵影人</text>
+          </svg>
+          <div class="stage-caption"><span>武生 · 示意影人</span><span>SHADOW STUDY — 001</span></div>
+        </div>
+        <div class="playbar"><button id="play" class="play-button" aria-label="播放当前动作">▷</button><div><strong id="playing-title">此刻，你是操偶师</strong><span id="playing-note">拖动签杆，或从右侧选择一段身法</span></div><button id="reset" class="text-button">↺ <span>归位</span></button></div>
+      </div>
+      <aside class="controls"><div class="panel-heading"><span class="eyebrow">THE MOVEMENT</span><h2>起一段身法</h2><p>从一个动作，认识皮影的灵巧。</p></div>
+        <div class="action-grid" role="group" aria-label="选择预设动作"><button class="action active" data-action="free" aria-pressed="true"><span class="action-icon">⌁</span><strong>自由操偶</strong><small>随心牵引</small></button><button class="action" data-action="wave" aria-pressed="false"><span class="action-icon">〰</span><strong>挥袖招手</strong><small>抬臂 · 摆手</small></button><button class="action" data-action="walk" aria-pressed="false"><span class="action-icon">彳</span><strong>信步登场</strong><small>迈步 · 行进</small></button><button class="action" data-action="bow" aria-pressed="false"><span class="action-icon">⌒</span><strong>俯身行礼</strong><small>俯身 · 起身</small></button><button class="action" data-action="salute" aria-pressed="false"><span class="action-icon">◇</span><strong>拱手亮相</strong><small>合手 · 定势</small></button><button class="action" data-action="dance" aria-pressed="false"><span class="action-icon">✧</span><strong>舒袖起舞</strong><small>展臂 · 摇身</small></button></div>
+        <div class="adjustments"><div class="section-label">签杆微调 <span>手动控制</span></div><label for="body">身体位置 <output id="body-value">居中</output></label><input id="body" type="range" min="-180" max="180" value="0" aria-label="身体水平位置"><label for="left">左侧手臂 <output id="left-value">自然</output></label><input id="left" type="range" min="-90" max="90" value="0" aria-label="画面左侧手臂抬起角度"><label for="right">右侧手臂 <output id="right-value">自然</output></label><input id="right" type="range" min="-90" max="90" value="0" aria-label="画面右侧手臂抬起角度"></div>
+        <div class="settings"><label class="toggle-row" for="show-rods"><span>显示操纵杆</span><input id="show-rods" type="checkbox" checked><span class="switch" aria-hidden="true"></span></label><label for="light">幕布灯光 <output id="light-value">75%</output></label><input id="light" type="range" min="25" max="100" value="75"><label for="speed">动作速度 <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="25" max="175" value="100" step="5"></div>
+      </aside>
+    </section>
+    <section class="learn" id="about"><div class="learn-title"><p class="eyebrow">BEHIND THE SCREEN</p><h2>三根签杆，<br>一个鲜活的世界。</h2><p>皮影的生命，一半在光里，一半在手中。</p></div><article><span class="number">01 /</span><h3>牵签成姿</h3><p>常见影人以身体和双手处的三根签杆操纵。试着牵动手柄，观察手臂关节如何随之屈伸。</p></article><article><span class="number">02 /</span><h3>隔幕成影</h3><p>光源、影人、透光幕面依次排列。透光的皮料与镂刻纹样，让影子也能呈现丰富色彩。</p></article><article><span class="number">03 /</span><h3>以动传情</h3><p>抬手、迈步、行礼，配合唱念与音乐，才组成一出完整的戏。本演示聚焦动作，不含唱腔。</p></article></section>
+    <p class="demo-note">本页为交互原型。影人是原创风格化示意，关节运动经简化；预设动作不代表特定流派的传统表演程式。<a href="https://www.ihchina.cn/art/detail/id/18619.html" target="_blank" rel="noopener noreferrer">了解皮影知识 ↗</a></p>
+  </main><footer><span>掌中光影 <span class="footer-dot">·</span> 让传统在指尖延续</span><span>一方幕布，万般故事。</span></footer>
+</body></html>
