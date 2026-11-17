@@ -61,7 +61,8 @@
 - 可完成性：仅使用 MOVE、JUMP、ATTACK、FAN、NEXT_QUEST 和 TICK 正常命令，从花果山开始走完三章；该模拟不是人工试玩。
 - 控制器：启动西游、键盘持续移动、J 挥棒击退妖怪、暂停、超时提示、本关重试及回到自由戏台；触屏按钮事件连接覆盖长按、释放与捕获清理。
 - 双人需求：文档已保存，双人功能未实现，不标为通过。
-- 远程 CI 与发布：代码推送后另行核实并追加记录。
+- 远程 CI：代码提交 `7ced765` 的 [GitHub Actions](https://github.com/codesknight/AI4TranditionalCulture_Shadow_Puppetry/actions/runs/44060396410) 已完成并成功，41 项测试与统一检查通过。
+- 发布：同一代码版本已更新至[影行西游 · 猴王三回记](https://shadow-puppetry-studio.daintycabin4098.chatgpt.site)，Sites 返回 `succeeded`。发布成功不代表人工试玩或视觉验收通过。
 - 环境限制：沿用 ENV-001，未完成真实浏览器视觉、手机触摸、辅助技术及主观手感验收。本轮未声称浏览器端到端测试通过。
 
 ### 西游版人工验收待办
